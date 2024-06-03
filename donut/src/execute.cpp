@@ -13,12 +13,17 @@ void execute() {
     ToggleFullscreen();
     SetTargetFPS(60);
 
-    int pixelSize = 10;
+    int pixelSize = 5;
     int gridWidth = screenWidth / pixelSize;
     int gridHeight = screenHeight / pixelSize;
     
     char grid[gridHeight][gridWidth];
+    int zBuffer[gridHeight][gridWidth];
+    char luminance[] = ".,-~:;=!*#$@";
 
+    Font arialFont = LoadFontEx("fonts/Arial.ttf", 10, 0, 250);
+    bool isFontLoaded = IsFontReady(arialFont);
+    TraceLog(LOG_INFO, isFontLoaded ? "Font loaded successfully" : "Font not loaded");
 
     int thetaSpacing = 1;
     int phiSpacing = 1;
@@ -36,6 +41,12 @@ void execute() {
         for (int i = 0; i < gridHeight; i++){
             for (int j = 0; j < gridWidth; j++){
                 grid[i][j] = ' ';
+            }
+        }
+
+        for (int i = 0; i < gridHeight; i++){
+            for (int j = 0; j < gridWidth; j++){
+                zBuffer[i][j] = 0;
             }
         }
 
@@ -68,15 +79,45 @@ void execute() {
                 int xp = (int) (gridWidth / 2 + k1 * ooz * x);
                 int yp = (int) (gridHeight / 2 + k1 * ooz * y);
 
-                grid[yp][xp] = '*';
+                float L = cosphi * costheta * sinB - cosA * costheta * sinphi - sinA * sintheta + cosB * (cosA * sintheta - costheta * sinA * sinphi);
+
+                if (ooz > zBuffer[yp][xp]) {
+                    zBuffer[yp][xp] = ooz;
+                    grid[yp][xp] = luminance[(int) (L * 8) > 0 ? (int) (L * 8) : 0];
+                }
             }
         }
         
         for (int i = 0; i < gridHeight; i++){
             for (int j = 0; j < gridWidth; j++){
-                if (grid[i][j] == '*'){
-                    DrawText("*", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
-                }
+                // if (grid[i][j] == '*'){
+                //     DrawText("*", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == '#'){
+                //     DrawText("#", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == '@'){
+                //     DrawText("@", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == '$'){
+                //     DrawText("$", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == '!'){
+                //     DrawText("!", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == '='){
+                //     DrawText("=", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == ':'){
+                //     DrawText(":", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == ';'){
+                //     DrawText(";", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == '~'){
+                //     DrawText("~", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == '-'){
+                //     DrawText("-", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // } else if (grid[i][j] == ','){
+                //     DrawText(",", (j * pixelSize) + (pixelSize / 2), (i * pixelSize) + pixelSize/2, 10, WHITE);
+                // }
+                char c[2];
+                c[0] = grid[i][j];
+                c[1] = '\0';
+                DrawTextEx(arialFont, c, {(float) (j * pixelSize) + (pixelSize / 2), (float) (i * pixelSize) + pixelSize/2}, arialFont.baseSize, 2, WHITE);
+                
             }
         }
 
