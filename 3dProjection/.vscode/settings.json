@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.css": "tailwindcss",
+        "cmath": "cpp",
+        "iterator": "cpp",
+        "vector": "cpp",
+        "iostream": "cpp",
+        "string": "cpp"
+    }
+}
